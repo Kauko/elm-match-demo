@@ -14,19 +14,25 @@ type Winner
   | Away
 
 
+type Match
+  = Match
+      { home : Team
+      , away : Team
+      , winner : Maybe Winner
+      }
+
+
 type alias Model =
-  { home : Team
-  , away : Team
-  , winner : Team
-  }
+  Match
 
 
 initialModel : Model
 initialModel =
-  { home = Team "Home"
-  , away = Team "Away"
-  , winner = Team "Home"
-  }
+  Match
+    { home = Team "Home"
+    , away = Team "Away"
+    , winner = Nothing
+    }
 
 
 type Action
@@ -34,21 +40,21 @@ type Action
   | AwayWins
 
 
-update : Action -> Model -> Model
-update action match =
+update : Action -> Match -> Model
+update action (Match match) =
   case action of
     HomeWins ->
-      { match | winner = match.home }
+      Match { match | winner = Just Home }
 
     AwayWins ->
-      { match | winner = match.away }
+      Match {  match | winner = Just Away }
 
 
-view : Address Action -> Model -> Html
-view address match =
+view : Address Action -> Match -> Html
+view address (Match match) =
   div
     []
-    [ div [] [text ("Winner: " ++ (toString match.winner))]
+    [ div [] [ text ("Winner: " ++ (toString match.winner)) ]
     , button [ onClick address HomeWins ] [ text (toString match.home) ]
     , button [ onClick address AwayWins ] [ text (toString match.away) ]
     ]

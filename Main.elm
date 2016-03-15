@@ -2,12 +2,12 @@ module Main (..) where
 
 import Html exposing (..)
 import StartApp.Simple as StartApp
-import Match
+import MatchList
 
 main: Signal Html
 main =
   StartApp.start
-    { model = Match.initialModel
-    , view = Match.view
-    , update = Match.update
+    { model = MatchList.initialModel
+    , view = MatchList.view
+    , update = MatchList.update
     }
