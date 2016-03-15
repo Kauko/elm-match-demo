@@ -10070,28 +10070,41 @@ Elm.Match.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
+   var winnerName = function (winner) {
+      var _p0 = winner;
+      if (_p0.ctor === "Just") {
+            if (_p0._0.ctor === "Home") {
+                  return "Home team wins!";
+               } else {
+                  return "The visiting team is the winner!";
+               }
+         } else {
+            return "You haven\'t bet on this match yet";
+         }
+   };
+   var teamName = function (team) {    var _p1 = team;return _p1._0;};
    var AwayWins = {ctor: "AwayWins"};
    var HomeWins = {ctor: "HomeWins"};
-   var view = F2(function (address,_p0) {
-      var _p1 = _p0;
-      var _p2 = _p1._0;
+   var view = F2(function (address,_p2) {
+      var _p3 = _p2;
+      var _p4 = _p3._0;
       return A2($Html.div,
       _U.list([]),
-      _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text(A2($Basics._op["++"],"Winner: ",$Basics.toString(_p2.winner)))]))
-              ,A2($Html.button,_U.list([A2($Html$Events.onClick,address,HomeWins)]),_U.list([$Html.text($Basics.toString(_p2.home))]))
-              ,A2($Html.button,_U.list([A2($Html$Events.onClick,address,AwayWins)]),_U.list([$Html.text($Basics.toString(_p2.away))]))]));
+      _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text(winnerName(_p4.winner))]))
+              ,A2($Html.button,_U.list([A2($Html$Events.onClick,address,HomeWins)]),_U.list([$Html.text(teamName(_p4.home))]))
+              ,A2($Html.button,_U.list([A2($Html$Events.onClick,address,AwayWins)]),_U.list([$Html.text(teamName(_p4.away))]))]));
    });
    var Match = function (a) {    return {ctor: "Match",_0: a};};
    var Away = {ctor: "Away"};
    var Home = {ctor: "Home"};
-   var update = F2(function (action,_p3) {
-      var _p4 = _p3;
-      var _p6 = _p4._0;
-      var _p5 = action;
-      if (_p5.ctor === "HomeWins") {
-            return Match(_U.update(_p6,{winner: $Maybe.Just(Home)}));
+   var update = F2(function (action,_p5) {
+      var _p6 = _p5;
+      var _p8 = _p6._0;
+      var _p7 = action;
+      if (_p7.ctor === "HomeWins") {
+            return Match(_U.update(_p8,{winner: $Maybe.Just(Home)}));
          } else {
-            return Match(_U.update(_p6,{winner: $Maybe.Just(Away)}));
+            return Match(_U.update(_p8,{winner: $Maybe.Just(Away)}));
          }
    });
    var Team = function (a) {    return {ctor: "Team",_0: a};};
@@ -10105,7 +10118,9 @@ Elm.Match.make = function (_elm) {
                               ,HomeWins: HomeWins
                               ,AwayWins: AwayWins
                               ,update: update
-                              ,view: view};
+                              ,view: view
+                              ,teamName: teamName
+                              ,winnerName: winnerName};
 };Elm.MatchList = Elm.MatchList || {};
 Elm.MatchList.make = function (_elm) {
    "use strict";

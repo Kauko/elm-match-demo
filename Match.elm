@@ -54,7 +54,19 @@ view : Address Action -> Match -> Html
 view address (Match match) =
   div
     []
-    [ div [] [ text ("Winner: " ++ (toString match.winner)) ]
-    , button [ onClick address HomeWins ] [ text (toString match.home) ]
-    , button [ onClick address AwayWins ] [ text (toString match.away) ]
+    [ div [] [ text (winnerName match.winner) ]
+    , button [ onClick address HomeWins ] [ text (teamName match.home) ]
+    , button [ onClick address AwayWins ] [ text (teamName match.away) ]
     ]
+
+teamName: Team -> String
+teamName team =
+  case team of
+    (Team str) -> str
+
+winnerName: Maybe Winner -> String
+winnerName winner =
+  case winner of
+    Just Home -> "Home team wins!"
+    Just Away -> "The visiting team is the winner!"
+    Nothing -> "You haven't bet on this match yet"
