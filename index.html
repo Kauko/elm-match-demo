@@ -10276,7 +10276,7 @@ Elm.Main.make = function (_elm) {
    });
    var initialModel = {matchListModel: $MatchList.initialModel,teamListModel: $TeamList.initialModel};
    var Model = F2(function (a,b) {    return {teamListModel: a,matchListModel: b};});
-   var main = $StartApp$Simple.start({model: $TeamList.initialModel,view: $TeamList.view,update: $TeamList.update});
+   var main = $StartApp$Simple.start({model: initialModel,view: view,update: update});
    return _elm.Main.values = {_op: _op
                              ,main: main
                              ,Model: Model

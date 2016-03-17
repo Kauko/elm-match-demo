@@ -10,34 +10,39 @@ import Signal exposing (..)
 main : Signal Html
 main =
   StartApp.start
-    { model = TeamList.initialModel
-    , view = TeamList.view
-    , update = TeamList.update
+    { model = initialModel
+    , view = view
+    , update = update
     }
+
 
 type alias Model =
   { teamListModel : TeamList.Model
   , matchListModel : MatchList.Model
   }
 
-initialModel: {matchListModel: MatchList.Model, teamListModel: TeamList.Model}
+
+initialModel : { matchListModel : MatchList.Model, teamListModel : TeamList.Model }
 initialModel =
-  {
-  matchListModel = MatchList.initialModel
-  ,teamListModel = TeamList.initialModel
+  { matchListModel = MatchList.initialModel
+  , teamListModel = TeamList.initialModel
   }
+
 
 type Action
   = MatchUpdate MatchList.Action
   | TeamUpdate TeamList.Action
 
-update: Action -> Model -> Model
+
+update : Action -> Model -> Model
 update action model =
   case action of
     MatchUpdate a ->
-      {model | matchListModel = MatchList.update a model.matchListModel}
+      { model | matchListModel = MatchList.update a model.matchListModel }
+
     TeamUpdate a ->
-      {model | teamListModel = TeamList.update a model.teamListModel}
+      { model | teamListModel = TeamList.update a model.teamListModel }
+
 
 view : Address Action -> Model -> Html
 view address model =
