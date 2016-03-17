@@ -9958,6 +9958,71 @@ Elm.Html.make = function (_elm) {
                              ,summary: summary
                              ,menuitem: menuitem
                              ,menu: menu};
+};Elm.Html = Elm.Html || {};
+Elm.Html.Events = Elm.Html.Events || {};
+Elm.Html.Events.make = function (_elm) {
+   "use strict";
+   _elm.Html = _elm.Html || {};
+   _elm.Html.Events = _elm.Html.Events || {};
+   if (_elm.Html.Events.values) return _elm.Html.Events.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $VirtualDom = Elm.VirtualDom.make(_elm);
+   var _op = {};
+   var keyCode = A2($Json$Decode._op[":="],"keyCode",$Json$Decode.$int);
+   var targetChecked = A2($Json$Decode.at,_U.list(["target","checked"]),$Json$Decode.bool);
+   var targetValue = A2($Json$Decode.at,_U.list(["target","value"]),$Json$Decode.string);
+   var defaultOptions = $VirtualDom.defaultOptions;
+   var Options = F2(function (a,b) {    return {stopPropagation: a,preventDefault: b};});
+   var onWithOptions = $VirtualDom.onWithOptions;
+   var on = $VirtualDom.on;
+   var messageOn = F3(function (name,addr,msg) {    return A3(on,name,$Json$Decode.value,function (_p0) {    return A2($Signal.message,addr,msg);});});
+   var onClick = messageOn("click");
+   var onDoubleClick = messageOn("dblclick");
+   var onMouseMove = messageOn("mousemove");
+   var onMouseDown = messageOn("mousedown");
+   var onMouseUp = messageOn("mouseup");
+   var onMouseEnter = messageOn("mouseenter");
+   var onMouseLeave = messageOn("mouseleave");
+   var onMouseOver = messageOn("mouseover");
+   var onMouseOut = messageOn("mouseout");
+   var onBlur = messageOn("blur");
+   var onFocus = messageOn("focus");
+   var onSubmit = messageOn("submit");
+   var onKey = F3(function (name,addr,handler) {    return A3(on,name,keyCode,function (code) {    return A2($Signal.message,addr,handler(code));});});
+   var onKeyUp = onKey("keyup");
+   var onKeyDown = onKey("keydown");
+   var onKeyPress = onKey("keypress");
+   return _elm.Html.Events.values = {_op: _op
+                                    ,onBlur: onBlur
+                                    ,onFocus: onFocus
+                                    ,onSubmit: onSubmit
+                                    ,onKeyUp: onKeyUp
+                                    ,onKeyDown: onKeyDown
+                                    ,onKeyPress: onKeyPress
+                                    ,onClick: onClick
+                                    ,onDoubleClick: onDoubleClick
+                                    ,onMouseMove: onMouseMove
+                                    ,onMouseDown: onMouseDown
+                                    ,onMouseUp: onMouseUp
+                                    ,onMouseEnter: onMouseEnter
+                                    ,onMouseLeave: onMouseLeave
+                                    ,onMouseOver: onMouseOver
+                                    ,onMouseOut: onMouseOut
+                                    ,on: on
+                                    ,onWithOptions: onWithOptions
+                                    ,defaultOptions: defaultOptions
+                                    ,targetValue: targetValue
+                                    ,targetChecked: targetChecked
+                                    ,keyCode: keyCode
+                                    ,Options: Options};
 };Elm.StartApp = Elm.StartApp || {};
 Elm.StartApp.Simple = Elm.StartApp.Simple || {};
 Elm.StartApp.Simple.make = function (_elm) {
@@ -9990,6 +10055,121 @@ Elm.StartApp.Simple.make = function (_elm) {
    };
    var Config = F3(function (a,b,c) {    return {model: a,view: b,update: c};});
    return _elm.StartApp.Simple.values = {_op: _op,Config: Config,start: start};
+};Elm.Match = Elm.Match || {};
+Elm.Match.make = function (_elm) {
+   "use strict";
+   _elm.Match = _elm.Match || {};
+   if (_elm.Match.values) return _elm.Match.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var winnerName = function (winner) {
+      var _p0 = winner;
+      if (_p0.ctor === "Just") {
+            if (_p0._0.ctor === "Home") {
+                  return "Home team wins!";
+               } else {
+                  return "The visiting team is the winner!";
+               }
+         } else {
+            return "You haven\'t bet on this match yet";
+         }
+   };
+   var teamName = function (team) {    var _p1 = team;return _p1._0;};
+   var AwayWins = {ctor: "AwayWins"};
+   var HomeWins = {ctor: "HomeWins"};
+   var view = F2(function (address,_p2) {
+      var _p3 = _p2;
+      var _p4 = _p3._0;
+      return A2($Html.div,
+      _U.list([]),
+      _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text(winnerName(_p4.winner))]))
+              ,A2($Html.button,_U.list([A2($Html$Events.onClick,address,HomeWins)]),_U.list([$Html.text(teamName(_p4.home))]))
+              ,A2($Html.button,_U.list([A2($Html$Events.onClick,address,AwayWins)]),_U.list([$Html.text(teamName(_p4.away))]))]));
+   });
+   var Match = function (a) {    return {ctor: "Match",_0: a};};
+   var Away = {ctor: "Away"};
+   var Home = {ctor: "Home"};
+   var update = F2(function (action,_p5) {
+      var _p6 = _p5;
+      var _p8 = _p6._0;
+      var _p7 = action;
+      if (_p7.ctor === "HomeWins") {
+            return Match(_U.update(_p8,{winner: $Maybe.Just(Home)}));
+         } else {
+            return Match(_U.update(_p8,{winner: $Maybe.Just(Away)}));
+         }
+   });
+   var Team = function (a) {    return {ctor: "Team",_0: a};};
+   var initialModel = Match({home: Team("Home"),away: Team("Away"),winner: $Maybe.Nothing});
+   return _elm.Match.values = {_op: _op
+                              ,Team: Team
+                              ,Home: Home
+                              ,Away: Away
+                              ,Match: Match
+                              ,initialModel: initialModel
+                              ,HomeWins: HomeWins
+                              ,AwayWins: AwayWins
+                              ,update: update
+                              ,view: view
+                              ,teamName: teamName
+                              ,winnerName: winnerName};
+};Elm.MatchList = Elm.MatchList || {};
+Elm.MatchList.make = function (_elm) {
+   "use strict";
+   _elm.MatchList = _elm.MatchList || {};
+   if (_elm.MatchList.values) return _elm.MatchList.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Match = Elm.Match.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var update = F2(function (_p0,model) {
+      var _p1 = _p0;
+      return _U.update(model,
+      {matches: A2($List.map,
+      function (_p2) {
+         var _p3 = _p2;
+         var _p5 = _p3._1;
+         var _p4 = _p3._0;
+         return _U.eq(_p4,_p1._0) ? {ctor: "_Tuple2",_0: _p4,_1: A2($Match.update,_p1._1,_p5)} : {ctor: "_Tuple2",_0: _p4,_1: _p5};
+      },
+      model.matches)});
+   });
+   var Modify = F2(function (a,b) {    return {ctor: "Modify",_0: a,_1: b};});
+   var view = F2(function (address,model) {
+      return A2($Html.div,
+      _U.list([]),
+      A2($List.map,function (_p6) {    var _p7 = _p6;return A2($Match.view,A2($Signal.forwardTo,address,Modify(_p7._0)),_p7._1);},model.matches));
+   });
+   var createMatch = F2(function (index,_p8) {
+      var _p9 = _p8;
+      return {ctor: "_Tuple2",_0: index,_1: $Match.Match({home: _p9._0,away: _p9._1,winner: $Maybe.Nothing})};
+   });
+   var Model = F2(function (a,b) {    return {matches: a,nextID: b};});
+   var matches = _U.list([{ctor: "_Tuple2",_0: $Match.Team("Colts"),_1: $Match.Team("Jaguars")}
+                         ,{ctor: "_Tuple2",_0: $Match.Team("Colts"),_1: $Match.Team("Patriots")}]);
+   var initialModel = {matches: A2($List.indexedMap,createMatch,matches),nextID: $List.length(matches)};
+   return _elm.MatchList.values = {_op: _op
+                                  ,matches: matches
+                                  ,Model: Model
+                                  ,initialModel: initialModel
+                                  ,createMatch: createMatch
+                                  ,Modify: Modify
+                                  ,update: update
+                                  ,view: view};
 };Elm.Team = Elm.Team || {};
 Elm.Team.make = function (_elm) {
    "use strict";
@@ -10071,12 +10251,38 @@ Elm.Main.make = function (_elm) {
    $Debug = Elm.Debug.make(_elm),
    $Html = Elm.Html.make(_elm),
    $List = Elm.List.make(_elm),
+   $MatchList = Elm.MatchList.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $StartApp$Simple = Elm.StartApp.Simple.make(_elm),
    $TeamList = Elm.TeamList.make(_elm);
    var _op = {};
+   var update = F2(function (action,model) {
+      var _p0 = action;
+      if (_p0.ctor === "MatchUpdate") {
+            return _U.update(model,{matchListModel: A2($MatchList.update,_p0._0,model.matchListModel)});
+         } else {
+            return _U.update(model,{teamListModel: A2($TeamList.update,_p0._0,model.teamListModel)});
+         }
+   });
+   var TeamUpdate = function (a) {    return {ctor: "TeamUpdate",_0: a};};
+   var MatchUpdate = function (a) {    return {ctor: "MatchUpdate",_0: a};};
+   var view = F2(function (address,model) {
+      return A2($Html.div,
+      _U.list([]),
+      _U.list([A2($TeamList.view,A2($Signal.forwardTo,address,TeamUpdate),model.teamListModel)
+              ,A2($MatchList.view,A2($Signal.forwardTo,address,MatchUpdate),model.matchListModel)]));
+   });
+   var initialModel = {matchListModel: $MatchList.initialModel,teamListModel: $TeamList.initialModel};
+   var Model = F2(function (a,b) {    return {teamListModel: a,matchListModel: b};});
    var main = $StartApp$Simple.start({model: $TeamList.initialModel,view: $TeamList.view,update: $TeamList.update});
-   return _elm.Main.values = {_op: _op,main: main};
+   return _elm.Main.values = {_op: _op
+                             ,main: main
+                             ,Model: Model
+                             ,initialModel: initialModel
+                             ,MatchUpdate: MatchUpdate
+                             ,TeamUpdate: TeamUpdate
+                             ,update: update
+                             ,view: view};
 };</script></head><body><script type="text/javascript">Elm.fullscreen(Elm.Main)</script></body></html>

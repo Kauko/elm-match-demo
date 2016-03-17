@@ -2,7 +2,7 @@ module Main (..) where
 
 import Html exposing (..)
 import StartApp.Simple as StartApp
--- import MatchList
+import MatchList
 import TeamList
 import Signal exposing (..)
 
@@ -15,35 +15,34 @@ main =
     , update = TeamList.update
     }
 
-
-{-
 type alias Model =
-  { teamList : TeamList.Model
-  , matchList : MatchList.Model
+  { teamListModel : TeamList.Model
+  , matchListModel : MatchList.Model
   }
 
+initialModel: {matchListModel: MatchList.Model, teamListModel: TeamList.Model}
 initialModel =
   {
-  matchList = MatchList.initialModel
-  ,teamList = TeamList.initialModel
+  matchListModel = MatchList.initialModel
+  ,teamListModel = TeamList.initialModel
   }
-
 
 type Action
   = MatchUpdate MatchList.Action
   | TeamUpdate TeamList.Action
 
+update: Action -> Model -> Model
 update action model =
   case action of
     MatchUpdate a ->
-      {model | matchList = MatchList.update a model.matchList.model}
+      {model | matchListModel = MatchList.update a model.matchListModel}
     TeamUpdate a ->
-      {model | teamList = TeamList.update a model.teamList.model}
+      {model | teamListModel = TeamList.update a model.teamListModel}
 
 view : Address Action -> Model -> Html
 view address model =
   div
     []
-    [ TeamList.view (Signal.forwardTo address TeamUpdate) model.teamList
-    , MatchList.view (Signal.forwardTo address MatchUpdate) model.matchList
-    ]-}
+    [ TeamList.view (Signal.forwardTo address TeamUpdate) model.teamListModel
+    , MatchList.view (Signal.forwardTo address MatchUpdate) model.matchListModel
+    ]
