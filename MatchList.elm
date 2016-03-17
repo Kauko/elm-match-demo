@@ -8,7 +8,8 @@ import Signal exposing (..)
 matches : List ( Match.Team, Match.Team )
 matches =
   [ ( Match.Team "Colts", Match.Team "Jaguars" )
-  ,( Match.Team "Colts", Match.Team "Patriots" ) ]
+  , ( Match.Team "Colts", Match.Team "Patriots" )
+  ]
 
 
 type alias ID =
@@ -58,6 +59,10 @@ view address model =
   div
     []
     (List.map
-      (\( id, matchModel ) -> Match.view (Signal.forwardTo address (Modify id)) matchModel)
+      (\( id, matchModel ) ->
+        Match.view
+          (Signal.forwardTo address (Modify id))
+          matchModel
+      )
       model.matches
     )
