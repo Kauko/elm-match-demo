@@ -39,13 +39,9 @@ update action (Team model) =
     Win ->
       Team { model | wins = 1 + model.wins }
 
-
-decWins : Int -> Int
+decWins: Int -> Int
 decWins wins =
-  if wins > 0 then
-    wins - 1
-  else
-    0
+  max 0 (wins - 1)
 
 
 view : Address Action -> Model -> Html
