@@ -36,17 +36,17 @@ initialModel =
 
 
 type Action
-  = HomeWins
-  | AwayWins
+  = HomeWins Team
+  | AwayWins Team
 
 
 update : Action -> Match -> Model
 update action (Match match) =
   case action of
-    HomeWins ->
+    HomeWins _ ->
       Match { match | winner = Just Home }
 
-    AwayWins ->
+    AwayWins _ ->
       Match {  match | winner = Just Away }
 
 
@@ -54,9 +54,9 @@ view : Address Action -> Match -> Html
 view address (Match match) =
   div
     []
-    [ div [] [ text (winnerName match.winner) ]
-    , button [ onClick address HomeWins ] [ text (teamName match.home) ]
-    , button [ onClick address AwayWins ] [ text (teamName match.away) ]
+    [ div [] [ text (winnerName (Match match)) ]
+    , button [ onClick address (HomeWins match.home)] [ text (teamName match.home) ]
+    , button [ onClick address (AwayWins match.away)] [ text (teamName match.away) ]
     ]
 
 teamName: Team -> String
@@ -64,9 +64,9 @@ teamName team =
   case team of
     (Team str) -> str
 
-winnerName: Maybe Winner -> String
-winnerName winner =
-  case winner of
-    Just Home -> "Home team wins!"
-    Just Away -> "The visiting team is the winner!"
+winnerName: Match -> String
+winnerName (Match match) =
+  case match.winner of
+    Just Home -> teamName match.home ++ " win at home."
+    Just Away -> "The visiting "++ teamName match.away ++" win!"
     Nothing -> "You haven't bet on this match yet"
