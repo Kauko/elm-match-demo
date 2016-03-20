@@ -3,6 +3,7 @@ module Match (..) where
 import Html exposing (..)
 import Html.Events exposing (..)
 import Signal exposing (..)
+import Team
 
 
 type Team
@@ -50,12 +51,16 @@ update action (Match match) =
       Match {  match | winner = Just Away }
 
 
-view : Address Action -> Match -> Html
-view address (Match match) =
+view : Address Action -> Address Team.Action -> Match -> Html
+view address teamAddress (Match match) =
   div
     []
     [ div [] [ text (winnerName (Match match)) ]
-    , button [ onClick address (HomeWins match.home)] [ text (teamName match.home) ]
+    , button
+    -- Can't have two onClick handlers!
+    [ onClick address (HomeWins match.home),
+    onClick teamAddress (Team.toTeamAction match.home match)]
+    [ text (teamName match.home) ]
     , button [ onClick address (AwayWins match.away)] [ text (teamName match.away) ]
     ]
 

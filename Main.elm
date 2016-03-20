@@ -27,9 +27,11 @@ initialModel =
   { matchListModel =
       MatchList.createMatches
         MatchList.initialModel
-        [( "Colts", "Patriots" ), ( "Colts", "Jaguars" ) ]
-  , teamListModel = TeamList.createTeams TeamList.initialModel
-  [("Indianapolis", "Colts"), ("Jacksonville", "Jaguars")]
+        [ ( "Colts", "Patriots" ), ( "Colts", "Jaguars" ) ]
+  , teamListModel =
+      TeamList.createTeams
+        TeamList.initialModel
+        [ ( "Jacksonville", "Jaguars" ), ( "Indianapolis", "Colts" ) ]
   }
 
 
@@ -50,8 +52,15 @@ update action model =
 
 view : Address Action -> Model -> Html
 view address model =
-  div
-    []
-    [ TeamList.view (Signal.forwardTo address TeamUpdate) model.teamListModel
-    , MatchList.view (Signal.forwardTo address MatchUpdate) model.matchListModel
-    ]
+  let
+    teamAddress =
+      (Signal.forwardTo address TeamUpdate)
+  in
+    div
+      []
+      [ TeamList.view teamAddress model.teamListModel
+      , MatchList.view
+          (Signal.forwardTo address MatchUpdate)
+          teamAddress
+          model.matchListModel
+      ]

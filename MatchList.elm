@@ -61,14 +61,14 @@ update (Modify id action) model =
   }
 
 
-view : Address Action -> Model -> Html
-view address model =
+view : Address Action -> Address a  -> Model -> Html
+view address teamAddress model =
   div
     []
     (List.map
       (\( id, matchModel ) ->
         Match.view
-          (Signal.forwardTo address (Modify id))
+          (Signal.forwardTo address (Modify id)) teamAddress
           matchModel
       )
       model.matches

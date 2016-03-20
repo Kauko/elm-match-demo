@@ -28,6 +28,18 @@ newTeam hometown name =
 type Action
   = Win
   | Lose
+  | NoOp
+
+{- Here we need to find out:
+
+1. Is this team playing in this match? (matchModel)
+2. If yes, is this team the winner or the loser? (winner)
+
+Match.view can't provide the teamModel for this function, so we can't
+do what we need to do. -}
+toTeamAction: a -> b -> Action
+toTeamAction winner matchModel =
+  NoOp
 
 
 update : Action -> Model -> Model
@@ -38,6 +50,7 @@ update action (Team model) =
 
     Win ->
       Team { model | wins = 1 + model.wins }
+    NoOp -> Team model
 
 decWins: Int -> Int
 decWins wins =
