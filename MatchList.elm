@@ -5,13 +5,6 @@ import Html exposing (..)
 import Signal exposing (..)
 
 
-matches : List ( Match.Team, Match.Team )
-matches =
-  [ ( Match.Team "Colts", Match.Team "Jaguars" )
-  , ( Match.Team "Colts", Match.Team "Patriots" )
-  ]
-
-
 type alias ID =
   Int
 
@@ -24,15 +17,29 @@ type alias Model =
 
 initialModel : Model
 initialModel =
-  { matches =
-      List.indexedMap createMatch matches
-  , nextID = List.length matches
+  { matches = []
+  , nextID = 0
   }
 
 
-createMatch : Int -> ( Match.Team, Match.Team ) -> ( Int, Match.Match )
+createMatch : Int -> ( String, String ) -> ( Int, Match.Match )
 createMatch index ( home, away ) =
-  ( index, Match.Match { home = home, away = away, winner = Nothing } )
+  ( index
+  , Match.Match
+      { home = (Match.Team home)
+      , away = (Match.Team away)
+      , winner = Nothing
+      }
+  )
+
+
+createMatches : Model -> List ( String, String ) -> Model
+createMatches model matchups =
+  let
+    matches =
+      List.indexedMap createMatch matchups
+  in
+    { model | matches = matches, nextID = List.length matches }
 
 
 type Action

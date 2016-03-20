@@ -14,9 +14,21 @@ type alias Model =
   , nextID : ID
   }
 
-initialModel: {nextID: ID, teams: List (ID, Team.Model)}
+
+initialModel : { nextID : ID, teams : List ( ID, Team.Model ) }
 initialModel =
-  {teams = [(0, (Team.newTeam "Indianapolis" "Colts"))], nextID = 0}
+  { teams = [ ( 0, (Team.newTeam "Indianapolis" "Colts") ) ], nextID = 0 }
+
+
+createTeams : Model -> List ( String, String ) -> Model
+createTeams model teamTuples =
+  let
+    teams =
+      List.indexedMap
+        (\index ( hometown, name ) -> ( index, Team.newTeam hometown name ))
+        teamTuples
+  in
+    { model | teams = teams, nextID = List.length teams }
 
 
 type Action

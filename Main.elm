@@ -24,8 +24,12 @@ type alias Model =
 
 initialModel : { matchListModel : MatchList.Model, teamListModel : TeamList.Model }
 initialModel =
-  { matchListModel = MatchList.initialModel
-  , teamListModel = TeamList.initialModel
+  { matchListModel =
+      MatchList.createMatches
+        MatchList.initialModel
+        [( "Colts", "Patriots" ), ( "Colts", "Jaguars" ) ]
+  , teamListModel = TeamList.createTeams TeamList.initialModel
+  [("Indianapolis", "Colts"), ("Jacksonville", "Jaguars")]
   }
 
 
