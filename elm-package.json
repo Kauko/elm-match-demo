@@ -1,7 +1,7 @@
 {
     "version": "1.0.0",
     "summary": "A demo project for learning Elm",
-    "repository": "https://github.com/kauko/elm-match-predictor",
+    "repository": "https://github.com/Kauko/elm-match-demo.git",
     "license": "MIT",
     "source-directories": [
         "."
