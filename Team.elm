@@ -2,6 +2,7 @@ module Team (..) where
 
 import Html exposing (..)
 import Signal exposing (..)
+import Effects
 
 
 type Team
@@ -42,15 +43,15 @@ toTeamAction winner matchModel =
   NoOp
 
 
-update : Action -> Model -> Model
+update : Action -> Model -> (Model, Effects.Effects Action)
 update action (Team model) =
   case action of
     Lose ->
-      Team { model | wins = decWins model.wins }
+      (Team { model | wins = decWins model.wins }, Effects.none)
 
     Win ->
-      Team { model | wins = 1 + model.wins }
-    NoOp -> Team model
+      (Team { model | wins = 1 + model.wins }, Effects.none)
+    NoOp -> (Team model, Effects.none)
 
 decWins: Int -> Int
 decWins wins =

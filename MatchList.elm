@@ -3,6 +3,8 @@ module MatchList (..) where
 import Match
 import Html exposing (..)
 import Signal exposing (..)
+import Effects
+import TeamList
 
 
 type alias ID =
@@ -46,22 +48,24 @@ type Action
   = Modify ID Match.Action
 
 
-update : Action -> Model -> Model
+update : Action -> Model -> (Model, Effects.Effects Action)
 update (Modify id action) model =
-  { model
-    | matches =
-        List.map
-          (\( matchId, matchModel ) ->
-            if matchId == id then
-              ( matchId, Match.update action matchModel )
-            else
-              ( matchId, matchModel )
-          )
-          model.matches
-  }
+  let
+    result = List.map
+      (\(matchID, matchModel) ->
+        if matchID == id then
+          let (newModel, newEffects) = Match.update action matchModel in
+          ((matchID, newModel), newEffects)
+        else
+          ((matchID, matchModel), Effects.none))
+      model.matches
+    matches = List.map (\(m, _) -> m) result
+    effects = Effects.batch (List.map (\((id, _), e) -> Effects.map (Modify id) e) result)
+  in
+    ({model | matches = matches}, effects)
 
 
-view : Address Action -> Address a  -> Model -> Html
+view : Address Action -> Address TeamList.Action  -> Model -> Html
 view address teamAddress model =
   div
     []

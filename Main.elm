@@ -1,19 +1,30 @@
 module Main (..) where
 
 import Html exposing (..)
-import StartApp.Simple as StartApp
+import StartApp as StartApp
+import Effects
+import Task
 import MatchList
 import TeamList
 import Signal exposing (..)
 
 
-main : Signal Html
-main =
-  StartApp.start
-    { model = initialModel
+app: StartApp.App {matchListModel: MatchList.Model, teamListModel: TeamList.Model}
+app =
+    StartApp.start
+    { init = (initialModel, Effects.none)
+    , inputs = []
     , view = view
     , update = update
     }
+
+main: Signal Html
+main =
+    app.html
+
+port tasks : Signal (Task.Task Effects.Never ())
+port tasks =
+    app.tasks
 
 
 type alias Model =
@@ -40,14 +51,16 @@ type Action
   | TeamUpdate TeamList.Action
 
 
-update : Action -> Model -> Model
+update : Action -> Model -> (Model, Effects.Effects Action)
 update action model =
   case action of
     MatchUpdate a ->
-      { model | matchListModel = MatchList.update a model.matchListModel }
+      let (newModel, newEffects) = MatchList.update a model.matchListModel in
+      ({ model | matchListModel =  newModel}, Effects.map MatchUpdate newEffects)
 
     TeamUpdate a ->
-      { model | teamListModel = TeamList.update a model.teamListModel }
+      let (newModel, newEffects) = TeamList.update a model.teamListModel in
+      ({ model | teamListModel =  newModel}, Effects.map TeamUpdate newEffects)
 
 
 view : Address Action -> Model -> Html
