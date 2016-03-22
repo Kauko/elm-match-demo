@@ -48,31 +48,41 @@ type Action
   = Modify ID Match.Action
 
 
-update : Action -> Model -> (Model, Effects.Effects Action)
+update : Action -> Model -> ( Model, Effects.Effects Action )
 update (Modify id action) model =
   let
-    result = List.map
-      (\(matchID, matchModel) ->
-        if matchID == id then
-          let (newModel, newEffects) = Match.update action matchModel in
-          ((matchID, newModel), newEffects)
-        else
-          ((matchID, matchModel), Effects.none))
-      model.matches
-    matches = List.map (\(m, _) -> m) result
-    effects = Effects.batch (List.map (\((id, _), e) -> Effects.map (Modify id) e) result)
+    result =
+      List.map
+        (\( matchID, matchModel ) ->
+          if matchID == id then
+            let
+              ( newModel, newEffects ) =
+                Match.update action matchModel
+            in
+              ( ( matchID, newModel ), newEffects )
+          else
+            ( ( matchID, matchModel ), Effects.none )
+        )
+        model.matches
+
+    matches =
+      List.map (\( m, _ ) -> m) result
+
+    effects =
+      Effects.batch (List.map (\( ( id, _ ), e ) -> Effects.map (Modify id) e) result)
   in
-    ({model | matches = matches}, effects)
+    ( { model | matches = matches }, effects )
 
 
-view : Address Action -> Address TeamList.Action  -> Model -> Html
+view : Address Action -> Address TeamList.Action -> Model -> Html
 view address teamAddress model =
   div
     []
     (List.map
       (\( id, matchModel ) ->
         Match.view
-          (Signal.forwardTo address (Modify id)) teamAddress
+          (Signal.forwardTo address (Modify id))
+          teamAddress
           matchModel
       )
       model.matches

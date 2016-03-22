@@ -42,14 +42,14 @@ type Action
   | AwayWins Team
 
 
-update : Action -> Match -> (Model, Effects.Effects Action)
+update : Action -> Match -> ( Model, Effects.Effects Action )
 update action (Match match) =
   case action of
     HomeWins _ ->
-      (Match { match | winner = Just Home }, Effects.none)
+      ( Match { match | winner = Just Home }, Effects.none )
 
     AwayWins _ ->
-      (Match {  match | winner = Just Away }, Effects.none)
+      ( Match { match | winner = Just Away }, Effects.none )
 
 
 view : Address Action -> Address TeamList.Action -> Match -> Html
@@ -58,20 +58,28 @@ view address teamAddress (Match match) =
     []
     [ div [] [ text (winnerName (Match match)) ]
     , button
-    -- Can't have two onClick handlers!
-    [ onClick address (HomeWins match.home)]
-    [ text (teamName match.home) ]
-    , button [ onClick address (AwayWins match.away)] [ text (teamName match.away) ]
+        -- Can't have two onClick handlers!
+        [ onClick address (HomeWins match.home) ]
+        [ text (teamName match.home) ]
+    , button [ onClick address (AwayWins match.away) ] [ text (teamName match.away) ]
     ]
 
-teamName: Team -> String
+
+teamName : Team -> String
 teamName team =
   case team of
-    (Team str) -> str
+    Team str ->
+      str
 
-winnerName: Match -> String
+
+winnerName : Match -> String
 winnerName (Match match) =
   case match.winner of
-    Just Home -> teamName match.home ++ " win at home."
-    Just Away -> "The visiting "++ teamName match.away ++" win!"
-    Nothing -> "You haven't bet on this match yet"
+    Just Home ->
+      teamName match.home ++ " win at home."
+
+    Just Away ->
+      "The visiting " ++ teamName match.away ++ " win!"
+
+    Nothing ->
+      "You haven't bet on this match yet"

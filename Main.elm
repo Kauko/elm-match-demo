@@ -9,22 +9,24 @@ import TeamList
 import Signal exposing (..)
 
 
-app: StartApp.App {matchListModel: MatchList.Model, teamListModel: TeamList.Model}
+app : StartApp.App { matchListModel : MatchList.Model, teamListModel : TeamList.Model }
 app =
-    StartApp.start
-    { init = (initialModel, Effects.none)
+  StartApp.start
+    { init = ( initialModel, Effects.none )
     , inputs = []
     , view = view
     , update = update
     }
 
-main: Signal Html
+
+main : Signal Html
 main =
-    app.html
+  app.html
+
 
 port tasks : Signal (Task.Task Effects.Never ())
 port tasks =
-    app.tasks
+  app.tasks
 
 
 type alias Model =
@@ -51,16 +53,22 @@ type Action
   | TeamUpdate TeamList.Action
 
 
-update : Action -> Model -> (Model, Effects.Effects Action)
+update : Action -> Model -> ( Model, Effects.Effects Action )
 update action model =
   case action of
     MatchUpdate a ->
-      let (newModel, newEffects) = MatchList.update a model.matchListModel in
-      ({ model | matchListModel =  newModel}, Effects.map MatchUpdate newEffects)
+      let
+        ( newModel, newEffects ) =
+          MatchList.update a model.matchListModel
+      in
+        ( { model | matchListModel = newModel }, Effects.map MatchUpdate newEffects )
 
     TeamUpdate a ->
-      let (newModel, newEffects) = TeamList.update a model.teamListModel in
-      ({ model | teamListModel =  newModel}, Effects.map TeamUpdate newEffects)
+      let
+        ( newModel, newEffects ) =
+          TeamList.update a model.teamListModel
+      in
+        ( { model | teamListModel = newModel }, Effects.map TeamUpdate newEffects )
 
 
 view : Address Action -> Model -> Html

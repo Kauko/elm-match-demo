@@ -31,29 +31,37 @@ type Action
   | Lose
   | NoOp
 
+
+
 {- Here we need to find out:
 
 1. Is this team playing in this match? (matchModel)
 2. If yes, is this team the winner or the loser? (winner)
 
 Match.view can't provide the teamModel for this function, so we can't
-do what we need to do. -}
-toTeamAction: a -> b -> Action
+do what we need to do.
+-}
+
+
+toTeamAction : a -> b -> Action
 toTeamAction winner matchModel =
   NoOp
 
 
-update : Action -> Model -> (Model, Effects.Effects Action)
+update : Action -> Model -> ( Model, Effects.Effects Action )
 update action (Team model) =
   case action of
     Lose ->
-      (Team { model | wins = decWins model.wins }, Effects.none)
+      ( Team { model | wins = decWins model.wins }, Effects.none )
 
     Win ->
-      (Team { model | wins = 1 + model.wins }, Effects.none)
-    NoOp -> (Team model, Effects.none)
+      ( Team { model | wins = 1 + model.wins }, Effects.none )
 
-decWins: Int -> Int
+    NoOp ->
+      ( Team model, Effects.none )
+
+
+decWins : Int -> Int
 decWins wins =
   max 0 (wins - 1)
 
