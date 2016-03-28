@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Events exposing (..)
 import Signal exposing (..)
 import Effects
+import Task
 import TeamList
 
 
@@ -14,6 +15,7 @@ type Team
 type Winner
   = Home
   | Away
+  | Neither
 
 
 type Match
@@ -37,19 +39,36 @@ initialModel =
     }
 
 
+teamWinFx : Task.Task Effects.Never a -> Effects.Effects Action
+teamWinFx param =
+  param
+    |> Task.map (always NoOp)
+    |> Effects.task
+
+
 type Action
   = HomeWins Team
   | AwayWins Team
+  | Draw
+  | NoOp
 
 
 update : Action -> Match -> ( Model, Effects.Effects Action )
 update action (Match match) =
   case action of
     HomeWins _ ->
+      -- So here instead of Effects.none, I should send an Effect
+      -- that holds a TeamList.Action...? How?
       ( Match { match | winner = Just Home }, Effects.none )
 
     AwayWins _ ->
       ( Match { match | winner = Just Away }, Effects.none )
+
+    Draw ->
+      ( Match { match | winner = Just Neither }, Effects.none )
+
+    NoOp ->
+      ( (Match match), Effects.none )
 
 
 view : Address Action -> Address TeamList.Action -> Match -> Html
@@ -57,10 +76,8 @@ view address teamAddress (Match match) =
   div
     []
     [ div [] [ text (winnerName (Match match)) ]
-    , button
-        -- Can't have two onClick handlers!
-        [ onClick address (HomeWins match.home) ]
-        [ text (teamName match.home) ]
+    , button [ onClick address (HomeWins match.home) ] [ text (teamName match.home) ]
+    , button [ onClick address Draw ] [ text "Draw" ]
     , button [ onClick address (AwayWins match.away) ] [ text (teamName match.away) ]
     ]
 
@@ -80,6 +97,9 @@ winnerName (Match match) =
 
     Just Away ->
       "The visiting " ++ teamName match.away ++ " win!"
+
+    Just Neither ->
+      "It's a draw."
 
     Nothing ->
       "You haven't bet on this match yet"
