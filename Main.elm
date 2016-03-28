@@ -13,7 +13,7 @@ app : StartApp.App { matchListModel : MatchList.Model, teamListModel : TeamList.
 app =
   StartApp.start
     { init = ( initialModel, Effects.none )
-    , inputs = []
+    , inputs = [mb.signal]
     , view = view
     , update = update
     }
@@ -23,6 +23,9 @@ main : Signal Html
 main =
   app.html
 
+mb: Mailbox Action
+mb =
+  Signal.mailbox NoOp
 
 port tasks : Signal (Task.Task Effects.Never ())
 port tasks =
@@ -51,11 +54,13 @@ initialModel =
 type Action
   = MatchUpdate MatchList.Action
   | TeamUpdate TeamList.Action
+  | NoOp
 
 
 update : Action -> Model -> ( Model, Effects.Effects Action )
 update action model =
   case action of
+    NoOp -> (model, Effects.none)
     MatchUpdate a ->
       let
         ( newModel, newEffects ) =
