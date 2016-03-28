@@ -15,40 +15,57 @@ type alias Model =
   }
 
 
-initialModel : { nextID : ID, teams : List ( ID, Team.Model ) }
-initialModel =
-  { teams = [ ( 0, (Team.newTeam "Indianapolis" "Colts") ) ], nextID = 0 }
-
-
-createTeams : Model -> List ( String, String ) -> Model
-createTeams model teamTuples =
+initialModel : List ( String, String ) -> Model
+initialModel teamTuples =
   let
     teams =
       List.indexedMap
         (\index ( hometown, name ) -> ( index, Team.newTeam hometown name ))
         teamTuples
-  in
-    { model | teams = teams, nextID = List.length teams }
+  in 
+    Model teams (List.length teams)
 
 
 type Action
   = Modify ID Team.Action
+  | UpdateOnMatch String String
+
+updateTeamsAction : String -> String -> Action
+updateTeamsAction = UpdateOnMatch
 
 
 update : Action -> Model -> Model
-update (Modify id action) model =
-  { model
-    | teams =
-        List.map
-          (\( teamID, teamModel ) ->
-            if teamID == id then
-              ( teamID, Team.update action teamModel )
-            else
-              ( teamID, teamModel )
-          )
-          model.teams
-  }
-
+update action model =
+  case action of 
+    Modify id act ->
+      { model
+        | teams =
+            List.map
+              (\( teamID, teamModel ) ->
+                if teamID == id then
+                  ( teamID, Team.update act teamModel )
+                else
+                  ( teamID, teamModel )
+              )
+              model.teams
+      }
+    UpdateOnMatch winner loser -> 
+      { model
+        | teams =
+            List.map
+              (\( teamID, teamModel ) ->
+                if Team.isTeam winner teamModel
+                then 
+                  ( teamID, Team.win teamModel )
+                else 
+                  if Team.isTeam loser teamModel
+                  then 
+                    ( teamID, Team.lose teamModel )
+                  else
+                    ( teamID, teamModel ) -- not part of the win-lose
+              )
+              model.teams
+      }
 
 view : Address Action -> Model -> Html
 view address model =

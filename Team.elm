@@ -4,25 +4,22 @@ import Html exposing (..)
 import Signal exposing (..)
 
 
-type Team
-  = Team
-      { fullName : String
-      , name : String
-      , wins : Int
-      }
-
-
 type alias Model =
-  Team
+  { fullName : String
+  , name : String
+  , wins : Int
+  }
 
+isTeam : String -> Model -> Bool
+isTeam name team =
+  team.name == name 
 
-newTeam : String -> String -> Team
+newTeam : String -> String -> Model
 newTeam hometown name =
-  Team
-    { fullName = (hometown ++ " " ++ name)
-    , name = name
-    , wins = 0
-    }
+  { fullName = (hometown ++ " " ++ name)
+  , name = name
+  , wins = 0
+  }
 
 
 type Action
@@ -30,14 +27,20 @@ type Action
   | Lose
 
 
+win : Model -> Model
+win = update Win 
+
+lose : Model -> Model
+lose = update Lose
+
 update : Action -> Model -> Model
-update action (Team model) =
+update action model =
   case action of
     Lose ->
-      Team { model | wins = decWins model.wins }
+      { model | wins = decWins model.wins }
 
     Win ->
-      Team { model | wins = 1 + model.wins }
+      { model | wins = 1 + model.wins }
 
 decWins: Int -> Int
 decWins wins =
@@ -45,5 +48,5 @@ decWins wins =
 
 
 view : Address Action -> Model -> Html
-view address (Team model) =
+view address model =
   div [] [ text ((toString model.fullName) ++ (toString model.wins)) ]
