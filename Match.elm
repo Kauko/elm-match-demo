@@ -4,9 +4,12 @@ import Html exposing (..)
 import Html.Events exposing (..)
 import Signal exposing (..)
 
+import Effects exposing (Effects)
+import Task
 
-type Team
-  = Team String
+
+type Team = 
+  Team String
 
 
 type Winner
@@ -14,59 +17,73 @@ type Winner
   | Away
 
 
-type Match
-  = Match
-      { home : Team
-      , away : Team
-      , winner : Maybe Winner
-      }
+type alias Model a =
+  { home : Team 
+  , away : Team
+  , winner : Maybe Winner
+  , informAddr : Signal.Address a 
+  , toAction : (String -> String -> a)
+  }
 
 
-type alias Model =
-  Match
-
-
-initialModel : Model
-initialModel =
-  Match
-    { home = Team "Home"
-    , away = Team "Away"
-    , winner = Nothing
-    }
+init : Signal.Address a -> (String -> String -> a) -> String -> String -> Model a
+init informAddr toAction home away =
+  { home = Team home
+  , away = Team away
+  , winner = Nothing
+  , informAddr = informAddr
+  , toAction = toAction
+  }
 
 
 type Action
   = HomeWins Team
   | AwayWins Team
+  | NoOp
 
 
-update : Action -> Match -> Model
-update action (Match match) =
+informEffect : Model a -> Bool -> Effects Action
+informEffect model homeWin =
+  let 
+    home = teamName model.home
+    away = teamName model.away
+    act = 
+      if homeWin 
+      then model.toAction home away
+      else model.toAction away home 
+    msgTask = Signal.send model.informAddr act
+  in 
+    msgTask `Task.andThen` (\_ -> Task.succeed NoOp)
+    |> Effects.task 
+
+
+update : Action -> Model a -> (Model a, Effects Action)
+update action model =
   case action of
     HomeWins _ ->
-      Match { match | winner = Just Home }
+      ({ model | winner = Just Home }, informEffect model True)
 
     AwayWins _ ->
-      Match {  match | winner = Just Away }
+      ({  model | winner = Just Away }, informEffect model False)
 
+    NoOp -> 
+      (model, Effects.none )
 
-view : Address Action -> Match -> Html
-view address (Match match) =
+view : Address Action -> Model a -> Html
+view address model =
   div
     []
-    [ div [] [ text (winnerName (Match match)) ]
-    , button [ onClick address (HomeWins match.home)] [ text (teamName match.home) ]
-    , button [ onClick address (AwayWins match.away)] [ text (teamName match.away) ]
+    [ div [] [ text (winnerName model) ]
+    , button [ onClick address (HomeWins model.home)] [ text (teamName model.home) ]
+    , button [ onClick address (AwayWins model.away)] [ text (teamName model.away) ]
     ]
 
 teamName: Team -> String
-teamName team =
-  case team of
-    (Team str) -> str
-
-winnerName: Match -> String
-winnerName (Match match) =
-  case match.winner of
-    Just Home -> teamName match.home ++ " win at home."
-    Just Away -> "The visiting "++ teamName match.away ++" win!"
+teamName (Team team) = team
+  
+winnerName: Model a-> String
+winnerName model =
+  case model.winner of
+    Just Home -> teamName model.home ++ " win at home."
+    Just Away -> "The visiting "++ teamName model.away ++" win!"
     Nothing -> "You haven't bet on this match yet"

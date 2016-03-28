@@ -4,64 +4,59 @@ import Match
 import Html exposing (..)
 import Signal exposing (..)
 
+import Effects exposing (Effects)
+
 
 type alias ID =
   Int
 
 
-type alias Model =
-  { matches : List ( ID, Match.Model )
+type alias Model a = 
+  { matches : List ( ID, Match.Model a)
   , nextID : ID
   }
 
 
-initialModel : Model
-initialModel =
-  { matches = []
+initialModel : Signal.Address a -> (String -> String -> a) -> List ( String, String ) -> Model a
+initialModel informAddr toAction matchups =
+  { matches = List.indexedMap (createMatch informAddr toAction) matchups
   , nextID = 0
+
   }
 
 
-createMatch : Int -> ( String, String ) -> ( Int, Match.Match )
-createMatch index ( home, away ) =
+createMatch : Signal.Address a -> (String -> String -> a) -> Int -> ( String, String ) -> ( Int, Match.Model a )
+createMatch informAddr toAction index ( home, away ) =
   ( index
-  , Match.Match
-      { home = (Match.Team home)
-      , away = (Match.Team away)
-      , winner = Nothing
-      }
+  , Match.init informAddr toAction home away
   )
-
-
-createMatches : Model -> List ( String, String ) -> Model
-createMatches model matchups =
-  let
-    matches =
-      List.indexedMap createMatch matchups
-  in
-    { model | matches = matches, nextID = List.length matches }
 
 
 type Action
   = Modify ID Match.Action
 
 
-update : Action -> Model -> Model
+update : Action -> Model a -> ( Model a, Effects Action)
 update (Modify id action) model =
-  { model
-    | matches =
-        List.map
-          (\( matchId, matchModel ) ->
-            if matchId == id then
-              ( matchId, Match.update action matchModel )
-            else
-              ( matchId, matchModel )
-          )
-          model.matches
-  }
+  let 
+    matches_and_fx = 
+      List.map
+        (\( matchId, matchModel ) ->
+          if matchId == id then
+            let 
+              (matchModel', fx) = Match.update action matchModel
+            in
+              (( matchId,  matchModel'), Effects.map (Modify id) fx)
+          else
+            (( matchId,  matchModel), Effects.none )
+        )
+        model.matches
+  in 
+    ( { model | matches = List.map fst matches_and_fx}
+    , Effects.batch <| List.map snd matches_and_fx)
 
 
-view : Address Action -> Model -> Html
+view : Address Action -> Model a -> Html
 view address model =
   div
     []
